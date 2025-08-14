@@ -65,6 +65,11 @@
       </select>
     </div>
     <div id="resultado" class="mt-4 text-gray-700 text-lg font-medium"></div>
+    <div id="enlace-dgt" class="mt-4 text-center hidden">
+        <a href="https://www.dgt.es/nuestros-servicios/permisos-de-conducir/permisos-extranjeros-y-de-fuerzas-y-cuerpos-de-seguridad/canjes-de-permisos/paises-con-convenio-de-canjes/" target="_blank" rel="noopener noreferrer" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors duration-200">
+            ¿Dudas con las equivalencias?<br>Ver Canje de Notas DGT
+        </a>
+    </div>
     <button id="detalle-categorias" type="button" class="hidden mt-4 w-full bg-gray-800 text-white py-2 rounded-md shadow hover:bg-gray-900">Ver detalles de las categorías</button>
   </div>
   <div id="detalle-contenedor" class="hidden mt-6 bg-white p-6 rounded shadow-md"></div>
@@ -110,6 +115,7 @@
     const resultadoDiv = document.getElementById('resultado');
     const detalleBoton = document.getElementById('detalle-categorias');
     const detalleContenedor = document.getElementById('detalle-contenedor');
+    const enlaceDGT = document.getElementById('enlace-dgt');
 
     paisSelect.addEventListener('change', () => {
       const pais = paisSelect.value;
@@ -126,6 +132,7 @@
       resultadoDiv.textContent = '';
       detalleContenedor.classList.add('hidden');
       detalleBoton.classList.add('hidden');
+      enlaceDGT.classList.add('hidden');
     });
 
     permisoSelect.addEventListener('change', () => {
@@ -136,10 +143,12 @@
         resultadoDiv.textContent = `PUEDE CONDUCIR: ${licenciaData[pais][tipoPermiso]}`;
         resultadoDiv.style.color = 'green';
         detalleBoton.classList.remove('hidden');
+        enlaceDGT.classList.remove('hidden');
       } else {
         resultadoDiv.textContent = 'No se encontraron datos para su selección.';
         resultadoDiv.style.color = 'red';
         detalleBoton.classList.add('hidden');
+        enlaceDGT.classList.add('hidden');
       }
     });
 
