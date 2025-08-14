@@ -396,12 +396,12 @@
         }
 
         // Sección de información sobre el canje con España
-        // Añadir la leyenda antes de esta sección
         html += `
             <h3 class="text-center text-black text-lg font-bold mb-2">¿EXISTE CONVENIO DE CANJE CON ESPAÑA?</h3>
         `;
         if (infoCanje) {
             if (infoCanje.tieneConvenio) {
+                const dgtUrl = "https://www.dgt.es/nuestros-servicios/permisos-de-conducir/permisos-extranjeros-y-de-fuerzas-y-cuerpos-de-seguridad/canjes-de-permisos/paises-con-convenio-de-canjes/";
                 html += `
                     <div class="p-4 rounded-lg bg-yellow-100 border border-yellow-400">
                         <p class="text-yellow-700 text-center font-bold">
@@ -410,6 +410,11 @@
                         <p class="text-yellow-700 text-center mt-2">
                             Fecha de entrada en vigor: <span class="font-semibold">${infoCanje.fecha}</span>
                         </p>
+                        <div class="mt-4 text-center">
+                            <a href="${dgtUrl}" target="_blank" rel="noopener noreferrer" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors duration-200">
+                                ¿Dudas con las equivalencias?<br>Ver Canje de Notas DGT
+                            </a>
+                        </div>
                     </div>
                 `;
             } else {
@@ -429,11 +434,10 @@
                 `;
             }
         } else {
-            // Si el país no está en la lista de convenios de canje.
             html += `
                 <div class="p-4 rounded-lg bg-red-100 border border-red-400">
                     <p class="text-red-700 text-center font-bold">
-                        No existe convenio de canje entre España y ${pais}.
+                        No se encontró información sobre el convenio de canje con España para ${pais}.
                     </p>
                 </div>
             `;
