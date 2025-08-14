@@ -13,6 +13,10 @@
         justify-content: center;
         text-align: center;
     }
+    .cpi-table-container {
+        max-height: 400px;
+        overflow-y: auto;
+    }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col pb-16">
@@ -52,7 +56,7 @@
     <div id="resultado" class="mt-4 text-sm font-medium"></div>
   </div>
 
-  <div class="bg-white shadow-md rounded-lg p-6 mt-4 text-center w-11/12 max-w-md mx-auto">
+  <div class="bg-white shadow-md rounded-lg p-6 mt-2 text-center w-11/12 max-w-md mx-auto">
     <h3 class="text-lg font-semibold mb-4">Añadir nuevos datos</h3>
     <button id="mostrarFormularioBtn" class="w-full bg-green-600 text-white py-2 rounded-md shadow hover:bg-green-700">
       Introduzca nuevo número de CPI
@@ -66,16 +70,42 @@
             <label for="nuevaFechaCpi" class="block text-sm font-bold text-gray-700 mb-1">Fecha de expedición:</label>
             <input type="date" id="nuevaFechaCpi" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
-        <button onclick="guardarNuevoCpi()" class="w-full bg-blue-600 text-white py-2 rounded-md shadow hover:bg-blue-700">
-            Guardar
-        </button>
+        <div class="flex space-x-2">
+            <button onclick="guardarNuevoCpi()" class="w-1/2 bg-blue-600 text-white py-2 rounded-md shadow hover:bg-blue-700">
+                Guardar
+            </button>
+            <button onclick="limpiarCampos()" class="w-1/2 bg-gray-400 text-white py-2 rounded-md shadow hover:bg-gray-500">
+                Limpiar campos
+            </button>
+        </div>
         <div id="mensajeGuardado" class="mt-4 text-sm font-medium"></div>
+    </div>
+  </div>
+
+  <div class="bg-white shadow-md rounded-lg p-6 mt-2 w-11/12 max-w-md mx-auto">
+    <button id="toggleCpiListBtn" class="w-full bg-lime-400 text-black font-bold py-2 rounded-md shadow hover:bg-lime-500">
+        Mostrar/Ocultar los 10 últimos CPI
+    </button>
+    <div id="cpiDataTable" class="mt-4 hidden">
+        <h3 class="text-lg font-semibold mb-4 text-center">10 últimos CPI guardados</h3>
+        <div class="cpi-table-container">
+            <table class="w-full text-sm text-left text-gray-500">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Número de orden</th>
+                        <th scope="col" class="px-6 py-3">Fecha</th>
+                    </tr>
+                </thead>
+                <tbody id="cpiList">
+                    </tbody>
+            </table>
+        </div>
     </div>
   </div>
   
   <div class="mt-8 flex justify-center">
     <button onclick="window.location.href='index.html'"
-            class="w-11/12 max-w-md p-4 text-gray-800 font-bold rounded-lg shadow-md transition flag-button-spain">
+            class="w-11/12 max-w-md p-4 bg-yellow-400 text-black font-bold rounded-lg shadow-md transition hover:bg-yellow-200">
       MENÚ PRINCIPAL
     </button>
   </div>
@@ -91,9 +121,6 @@
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
 
   <script>
-    // --------------------------------------------------------
-    // TU BLOQUE DE CÓDIGO firebaseConfig COMPLETO Y ACTUALIZADO
-    // --------------------------------------------------------
     const firebaseConfig = {
       apiKey: "AIzaSyCbrIC_qmnXN0YFTVjNGR-j_Zpq_6V_glA",
       authDomain: "gad-alicante-f0d56.firebaseapp.com",
@@ -103,16 +130,13 @@
       messagingSenderId: "453863147861",
       appId: "1:453863147861:web:50be7eb436bbee6ec4c7dc"
     };
-    // --------------------------------------------------------
 
-    // NO MODIFIQUES NADA DE ESTO
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
     const cpiRef = database.ref('cpi_francia');
 
     let datosCPI = [];
 
-    // Array con tus datos originales. Esto se cargará a Firebase una sola vez.
     const datosCPIOriginales = [
       { fecha: "2018-08-06", numero: 10191919336 },
       { fecha: "2019-01-07", numero: 10204026640 },
@@ -264,8 +288,6 @@
       { fecha: "2025-07-28", numero: 10402260107 }
     ];
 
-    // Carga los datos de Firebase al inicio
-    // Primero, comprueba si la base de datos está vacía
     cpiRef.once('value', (snapshot) => {
       if (!snapshot.exists()) {
         console.log("Base de datos vacía. Subiendo los datos originales...");
@@ -285,7 +307,7 @@
                 fecha: new Date(data.fecha)
             });
         });
-        datosCPI.sort((a, b) => a.numero - b.numero);
+        renderizarTablaCpi();
     });
 
     const mostrarFormularioBtn = document.getElementById('mostrarFormularioBtn');
@@ -293,10 +315,24 @@
     const nuevoNumeroCpiInput = document.getElementById('nuevoNumeroCpi');
     const nuevaFechaCpiInput = document.getElementById('nuevaFechaCpi');
     const mensajeGuardadoDiv = document.getElementById('mensajeGuardado');
+    const cpiListDiv = document.getElementById('cpiList');
+    const cpiDataTable = document.getElementById('cpiDataTable');
+    const toggleCpiListBtn = document.getElementById('toggleCpiListBtn');
 
     mostrarFormularioBtn.addEventListener('click', () => {
         formularioCpi.classList.toggle('hidden');
     });
+
+    toggleCpiListBtn.addEventListener('click', () => {
+        cpiDataTable.classList.toggle('hidden');
+    });
+
+    function limpiarCampos() {
+        nuevoNumeroCpiInput.value = '';
+        nuevaFechaCpiInput.value = '';
+        mensajeGuardadoDiv.textContent = '';
+        mensajeGuardadoDiv.style.color = '';
+    }
 
     function guardarNuevoCpi() {
         const nuevoNumero = parseInt(nuevoNumeroCpiInput.value);
@@ -305,6 +341,13 @@
         if (isNaN(nuevoNumero) || !nuevaFecha) {
             mensajeGuardadoDiv.textContent = 'Por favor, introduce un número y una fecha válidos.';
             mensajeGuardadoDiv.style.color = 'orange';
+            return;
+        }
+
+        const cpiExistente = datosCPI.find(dato => dato.numero === nuevoNumero);
+        if (cpiExistente) {
+            mensajeGuardadoDiv.innerHTML = `El NÚMERO YA EXISTE CON FECHA: <span style="font-weight: bold;">${cpiExistente.fecha.toLocaleDateString("es-ES")}</span>`;
+            mensajeGuardadoDiv.style.color = 'red';
             return;
         }
 
@@ -318,8 +361,7 @@
             .then(() => {
                 mensajeGuardadoDiv.textContent = '¡Datos guardados con éxito!';
                 mensajeGuardadoDiv.style.color = 'green';
-                nuevoNumeroCpiInput.value = '';
-                nuevaFechaCpiInput.value = '';
+                limpiarCampos(); // Llama a la nueva función para limpiar
                 formularioCpi.classList.add('hidden');
             })
             .catch(error => {
@@ -327,8 +369,41 @@
                 mensajeGuardadoDiv.style.color = 'red';
             });
     }
+    
+    // Función auxiliar para añadir un cero si el número es de una cifra
+    function pad(number) {
+        return number < 10 ? '0' + number : number;
+    }
 
-    // Funciones originales para calcular la fecha
+    function renderizarTablaCpi() {
+      cpiListDiv.innerHTML = '';
+      
+      const datosOrdenados = datosCPI.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
+      const ultimos10Datos = datosOrdenados.slice(0, 10);
+      
+      ultimos10Datos.forEach(dato => {
+        const fila = document.createElement('tr');
+        fila.classList.add('bg-white', 'border-b', 'hover:bg-gray-50');
+
+        const celdaNumero = document.createElement('td');
+        celdaNumero.classList.add('px-6', 'py-4', 'font-medium', 'text-gray-900', 'whitespace-nowrap');
+        celdaNumero.textContent = dato.numero;
+
+        const celdaFecha = document.createElement('td');
+        celdaFecha.classList.add('px-6', 'py-4');
+        
+        // Formato manual para añadir ceros
+        const dia = pad(dato.fecha.getDate());
+        const mes = pad(dato.fecha.getMonth() + 1);
+        const anio = dato.fecha.getFullYear();
+        celdaFecha.textContent = `${dia}/${mes}/${anio}`;
+
+        fila.appendChild(celdaNumero);
+        fila.appendChild(celdaFecha);
+        cpiListDiv.appendChild(fila);
+      });
+    }
+
     function interpolarFecha(numero) {
         const datos = datosCPI.sort((a, b) => a.numero - b.numero);
         const exacto = datos.find(d => d.numero === numero);
