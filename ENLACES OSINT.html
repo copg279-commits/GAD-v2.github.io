@@ -6,46 +6,12 @@
     <title>Buscador de Enlaces por País</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-            .flag-button-spain {
-        background: linear-gradient(to top, #c60b1e 0%, #c60b1e 33%, #ffc400 33%, #ffc400 66%, #c60b1e 66%, #c60b1e 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-    }
-  </style>
-</head>
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 20;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 500px;
-            border-radius: 8px;
-            position: relative;
-        }
-        .close-button {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .close-button:hover, .close-button:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
+        .flag-button-spain {
+            background: linear-gradient(to top, #c60b1e 0%, #c60b1e 33%, #ffc400 33%, #ffc400 66%, #c60b1e 66%, #c60b1e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
         }
     </style>
 </head>
@@ -60,7 +26,6 @@
     <h1 class="text-black text-center mt-6 text-xl font-bold px-4">
         Buscador de Enlaces por País
     </h1>
-
     <div id="countrySearchContainer" class="w-11/12 max-w-md mx-auto mt-4">
         <p class="text-center mt-2 px-4 mb-2">
             Introduce el nombre de un país para encontrar sus enlaces.
@@ -69,7 +34,7 @@
         <select id="paises" onchange="buscar(this.value)"
                 class="block mx-auto mt-4 p-2 text-base w-11/12 max-w-md border border-gray-300 rounded-lg">
             <option value="">-- Seleccionar país --</option>
-            </select>
+        </select>
     </div>
     
     <div id="linkList" class="mt-6 p-4 bg-white shadow rounded-lg w-11/12 max-w-md mx-auto text-left" style="display:none;">
@@ -85,10 +50,12 @@
 
     <div class="mt-8 flex justify-center">
     <button onclick="window.location.href='index.html'"
-            class="w-11/12 max-w-md p-4 text-gray-800 font-bold rounded-lg shadow-md transition flag-button-spain">
+            class="w-11/12 max-w-md p-4 bg-yellow-400 text-black font-bold rounded-lg shadow-md transition hover:bg-yellow-200">
         MENÚ PRINCIPAL
     </button>
 </div>
+
+
     <footer class="mt-auto text-center py-6 bg-gray-200">
         <hr class="border-t border-gray-400 w-11/12 max-w-md mx-auto mb-4">
         <p class="font-bold">GRUPO DE ANÁLISIS DOCUMENTAL</p>
@@ -739,7 +706,7 @@
 "descripcion": "Consulta la marca y matrícula del vehículo con el número de certificado."
 },
 {
-"nombre": "Permiso Conducir y otros documentos. Nº corto (9 cifras)",
+"nombre": "Permiso conducir y otros documentos. Nº corto (9 cifras)",
 "url": "https://e-services.md/?q=ro/content/verifisa-statutul-documentului",
 "descripcion": "Verificación de permisos de conducir y otros documentos con su número corto."
 },
@@ -1012,14 +979,13 @@
 }
 ]
 };
-
-        const linkList = document.getElementById('linkList');
-        const linksContainer = document.getElementById('linksContainer');
-        const resultsTitle = document.getElementById('resultsTitle');
         const paisesSelect = document.getElementById('paises');
+        const linkList = document.getElementById('linkList');
+        const resultsTitle = document.getElementById('resultsTitle');
+        const linksContainer = document.getElementById('linksContainer');
 
-        // Función para llenar el menú desplegable con la lista de países
         function populateSelect() {
+            paisesSelect.innerHTML = '<option value="">-- Seleccionar país --</option>';
             const sortedCountries = Object.keys(paisesData).sort();
             sortedCountries.forEach(country => {
                 const option = document.createElement('option');
@@ -1029,41 +995,42 @@
             });
         }
 
-        // Llama a la función para llenar el menú al cargar la página
-        document.addEventListener('DOMContentLoaded', populateSelect);
+        document.addEventListener('DOMContentLoaded', () => {
+            populateSelect();
 
-        function buscar(pais) {
-            linksContainer.innerHTML = '';
-            if (!pais) {
+            window.buscar = function(pais) {
+                linksContainer.innerHTML = '';
+                if (!pais) {
+                    linkList.style.display = 'none';
+                    return;
+                }
+
+                linkList.style.display = 'block';
+                let results = paisesData[pais];
+                let title = `Enlaces de ${pais}`;
+
+                resultsTitle.textContent = title;
+
+                if (results && results.length > 0) {
+                    results.forEach(link => {
+                        const linkDiv = document.createElement('a');
+                        linkDiv.href = link.url;
+                        linkDiv.target = "_blank";
+                        linkDiv.rel = "noreferrer";
+                        linkDiv.classList.add('bg-white', 'p-4', 'shadow-md', 'rounded-lg', 'mb-2', 'cursor-pointer', 'hover:bg-gray-50', 'block');
+                        linkDiv.innerHTML = `<h3 class="font-bold text-blue-600">${link.nombre}</h3><p class="text-sm text-gray-600">${link.descripcion}</p>`;
+                        linksContainer.appendChild(linkDiv);
+                    });
+                } else {
+                    linksContainer.innerHTML = `<p class="text-center text-gray-500">No se encontraron enlaces para la búsqueda.</p>`;
+                }
+            };
+            
+            window.volverAtras = function() {
                 linkList.style.display = 'none';
-                return;
-            }
-
-            linkList.style.display = 'block';
-            let results = paisesData[pais];
-            let title = `Enlaces de ${pais}`;
-
-            resultsTitle.textContent = title;
-
-            if (results && results.length > 0) {
-                results.forEach(link => {
-                    const linkDiv = document.createElement('a');
-                    linkDiv.href = link.url;
-                    linkDiv.target = "_blank";
-                    linkDiv.rel = "noreferrer";
-                    linkDiv.classList.add('bg-white', 'p-4', 'shadow-md', 'rounded-lg', 'mb-2', 'cursor-pointer', 'hover:bg-gray-50', 'block');
-                    linkDiv.innerHTML = `<h3 class="font-bold text-blue-600">${link.nombre}</h3><p class="text-sm text-gray-600">${link.descripcion}</p>`;
-                    linksContainer.appendChild(linkDiv);
-                });
-            } else {
-                linksContainer.innerHTML = `<p class="text-center text-gray-500">No se encontraron enlaces para la búsqueda.</p>`;
-            }
-        }
-
-        function volverAtras() {
-            linkList.style.display = 'none';
-            paisesSelect.value = ''; // Resetea la selección
-        }
+                paisesSelect.value = '';
+            };
+        });
     </script>
 </body>
 </html>
